@@ -1,0 +1,971 @@
+<!doctype html>
+<html lang="gu">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" href="data:," />
+    <title>Ambika Platform — Demo Prototype</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Questrial&family=Noto+Sans+Gujarati:wght@400;600&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet" />
+    <style>
+      :root{
+        --white:#FFFFFF;
+        --fog:#F5F5F7;
+        --fog2:#ECECF0;
+        --ink:#1D1D1F;
+        --smoke:#424245;
+        --muted:#6E6E73;
+        --meta:#86868B;
+        --blue:#0071E3;
+        --blue-hover:#0077ED;
+        --green:#1F9D55;
+        --amber:#E8A13A;
+        --red:#D64545;
+        --teal:#0E7C86;
+        --hairline:#D2D2D7;
+        --radius:28px;
+      }
+      *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+      html,body{ margin:0; padding:0; }
+      body{
+        background:var(--fog);
+        color:var(--ink);
+        font-family:'Questrial','Noto Sans Gujarati','Noto Sans Devanagari',system-ui,sans-serif;
+        font-size:18px;
+        line-height:1.45;
+      }
+      button{ font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; }
+      input{ font-family:inherit; }
+
+      /* Phone column */
+      .phone{
+        max-width:430px;
+        margin:0 auto;
+        background:var(--white);
+        min-height:100dvh;
+        display:flex;
+        flex-direction:column;
+        position:relative;
+      }
+      @media (min-width:520px){
+        .phone{ border-left:1px solid var(--hairline); border-right:1px solid var(--hairline); }
+      }
+
+      /* Header */
+      .appbar{
+        position:sticky; top:0; z-index:20;
+        background:var(--white);
+        padding:14px 18px 10px;
+      }
+      .appbar-row{ display:flex; align-items:center; gap:12px; }
+      .icon-btn{
+        width:48px; height:48px; flex:0 0 48px;
+        border-radius:50%;
+        background:var(--fog);
+        display:flex; align-items:center; justify-content:center;
+        color:var(--ink);
+      }
+      .icon-btn:active{ background:var(--fog2); }
+      .icon-btn svg{ width:26px; height:26px; }
+      .appbar-title{
+        flex:1; text-align:center;
+        font-size:21px; letter-spacing:-0.01em;
+        white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      }
+      .appbar-spacer{ width:48px; flex:0 0 48px; }
+
+      /* Language switcher */
+      .langbar{
+        display:flex; gap:8px;
+        background:var(--fog);
+        border-radius:999px;
+        padding:5px;
+      }
+      .langbar button{
+        flex:1; min-height:48px;
+        border-radius:999px;
+        font-size:17px;
+        color:var(--smoke);
+        padding:6px 4px;
+      }
+      .langbar button.active{
+        background:var(--blue); color:#fff;
+      }
+      .langbar.big{ margin-top:14px; }
+      .langbar.big button{ min-height:56px; font-size:18px; }
+      .appbar .langbar{ margin-top:12px; }
+      .appbar .langbar button{ min-height:42px; font-size:16px; }
+
+      /* Views */
+      .view{ padding:10px 20px 40px; animation:viewIn .28s ease both; flex:1; }
+      @keyframes viewIn{ from{ opacity:0; transform:translateX(16px); } to{ opacity:1; transform:none; } }
+      @media (prefers-reduced-motion: reduce){
+        .view{ animation:none; }
+      }
+
+      /* Login */
+      .login-hero{ text-align:center; padding:18px 6px 4px; }
+      .login-hero svg{ width:100%; max-width:340px; height:auto; }
+      .trust-name{ font-size:27px; letter-spacing:-0.01em; text-align:center; margin:14px 0 2px; }
+      .trust-sub{ text-align:center; color:var(--muted); font-size:17px; margin:0 0 8px; }
+      .field{ margin-top:16px; }
+      .field label{ display:block; font-size:17px; color:var(--smoke); margin:0 0 8px 6px; }
+      .field-wrap{
+        display:flex; align-items:center; gap:12px;
+        background:var(--fog); border-radius:20px;
+        padding:0 18px; min-height:68px;
+      }
+      .field-wrap svg{ width:26px; height:26px; color:var(--meta); flex:0 0 26px; }
+      .field-wrap input{
+        flex:1; border:none; outline:none; background:transparent;
+        font-size:20px; color:var(--ink); min-width:0;
+      }
+      .demo-note{ text-align:center; color:var(--meta); font-size:15px; margin:14px 10px 0; }
+      .login-footer{ text-align:center; color:var(--meta); font-size:14px; padding:26px 20px 8px; }
+
+      /* Buttons */
+      .btn{
+        display:flex; align-items:center; justify-content:center; gap:10px;
+        width:100%; min-height:64px;
+        border-radius:999px;
+        font-size:20px;
+        padding:12px 22px;
+        margin-top:20px;
+        text-align:center;
+      }
+      .btn svg{ width:26px; height:26px; flex:0 0 26px; }
+      .btn-blue{ background:var(--blue); color:#fff; }
+      .btn-blue:active{ background:var(--blue-hover); }
+      .btn-green{ background:var(--green); color:#fff; }
+      .btn-outline{ background:var(--white); color:var(--blue); border:2px solid var(--blue); }
+      .btn-fog{ background:var(--fog); color:var(--ink); }
+      .btn.disabled{ opacity:.38; pointer-events:none; }
+      .btn-row{ display:flex; gap:12px; }
+      .btn-row .btn{ flex:1; }
+
+      /* Home */
+      .greeting{ font-size:28px; letter-spacing:-0.01em; margin:8px 2px 4px; }
+      .greeting-sub{ color:var(--muted); font-size:17px; margin:0 2px 20px; }
+      .tile-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+      .tile{
+        background:var(--fog); border-radius:var(--radius);
+        padding:22px 14px 18px;
+        display:flex; flex-direction:column; align-items:center; gap:12px;
+        text-align:center; min-height:158px; justify-content:center;
+        width:100%;
+      }
+      .tile:active{ background:var(--fog2); }
+      .tile .chip{
+        width:68px; height:68px; border-radius:50%;
+        display:flex; align-items:center; justify-content:center;
+      }
+      .tile .chip svg{ width:34px; height:34px; }
+      .tile .tile-label{ font-size:19px; line-height:1.25; }
+
+      /* Steps */
+      .step-dots{ display:flex; align-items:center; justify-content:center; gap:10px; margin:8px 0 18px; }
+      .step-dot{
+        width:40px; height:40px; border-radius:50%;
+        background:var(--fog); color:var(--muted);
+        display:flex; align-items:center; justify-content:center;
+        font-size:18px;
+      }
+      .step-dot.now{ background:var(--blue); color:#fff; }
+      .step-dot.done{ background:var(--green); color:#fff; }
+      .step-line{ width:34px; height:4px; border-radius:2px; background:var(--fog2); }
+      .step-q{ font-size:26px; letter-spacing:-0.01em; text-align:center; margin:2px 0 20px; }
+
+      .cat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+      .cat{
+        background:var(--fog); border-radius:var(--radius);
+        padding:20px 10px 16px; min-height:132px;
+        display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
+        font-size:18px; text-align:center; width:100%;
+        border:3px solid transparent;
+      }
+      .cat svg{ width:40px; height:40px; }
+      .cat.selected{ border-color:var(--blue); background:#E8F2FD; }
+
+      .place-list{ display:flex; flex-direction:column; gap:12px; }
+      .place{
+        background:var(--fog); border-radius:22px;
+        min-height:64px; padding:12px 20px;
+        display:flex; align-items:center; gap:14px;
+        font-size:19px; text-align:left; width:100%;
+        border:3px solid transparent;
+      }
+      .place svg{ width:28px; height:28px; color:var(--blue); flex:0 0 28px; }
+      .place.selected{ border-color:var(--blue); background:#E8F2FD; }
+
+      .photo-tile{
+        background:var(--fog); border-radius:var(--radius);
+        padding:16px; text-align:center; margin-top:16px;
+      }
+      .photo-tile svg{ width:100%; max-width:280px; height:auto; }
+      .photo-ok{
+        display:inline-flex; align-items:center; gap:8px;
+        color:var(--green); font-size:18px; margin-top:10px;
+      }
+      .photo-ok svg{ width:22px; height:22px; }
+      .spoken-box{
+        background:var(--fog); border-radius:22px;
+        padding:18px 20px; font-size:19px; margin-top:16px; text-align:center;
+      }
+      .or-line{ text-align:center; color:var(--meta); font-size:16px; margin:20px 0 2px; }
+
+      .urgency-list{ display:flex; flex-direction:column; gap:14px; }
+      .urgency{
+        background:var(--fog); border-radius:24px;
+        min-height:78px; padding:14px 22px;
+        display:flex; align-items:center; gap:16px;
+        font-size:21px; text-align:left; width:100%;
+        border:3px solid transparent;
+      }
+      .urgency .dot{ width:22px; height:22px; border-radius:50%; flex:0 0 22px; }
+      .urgency.selected{ border-color:var(--ink); background:var(--white); }
+
+      /* Success */
+      .success-wrap{ text-align:center; padding-top:34px; }
+      .big-tick{
+        width:110px; height:110px; border-radius:50%;
+        background:var(--green); color:#fff;
+        display:flex; align-items:center; justify-content:center;
+        margin:0 auto 22px;
+      }
+      .big-tick svg{ width:58px; height:58px; }
+      .big-tick.blue{ background:var(--blue); }
+      .success-title{ font-size:26px; letter-spacing:-0.01em; margin:0 10px 8px; }
+      .ticket-no{ font-size:21px; color:var(--smoke); margin:0 0 6px; }
+      .ticket-no b{ color:var(--ink); font-weight:600; }
+
+      /* Tracker */
+      .tracker{ margin:30px 6px 6px; }
+      .tracker-track{ display:flex; align-items:flex-start; }
+      .tracker-step{ flex:0 0 auto; display:flex; flex-direction:column; align-items:center; width:64px; }
+      .tracker-dot{
+        width:44px; height:44px; border-radius:50%;
+        background:var(--fog2); color:var(--muted);
+        display:flex; align-items:center; justify-content:center; font-size:18px;
+      }
+      .tracker-dot svg{ width:24px; height:24px; }
+      .tracker-dot.done{ background:var(--green); color:#fff; }
+      .tracker-dot.now{ background:var(--blue); color:#fff; }
+      .tracker-bar{ flex:1; height:5px; border-radius:3px; background:var(--fog2); margin-top:20px; }
+      .tracker-bar.done{ background:var(--green); }
+      .tracker-labels{ display:flex; margin-top:10px; }
+      .tracker-labels span{ flex:1; text-align:center; font-size:15.5px; color:var(--smoke); padding:0 2px; }
+
+      /* Lists and cards */
+      .card{
+        background:var(--fog); border-radius:var(--radius);
+        padding:20px; margin-bottom:16px; width:100%; text-align:left; display:block;
+      }
+      button.card:active{ background:var(--fog2); }
+      .card-top{ display:flex; gap:16px; align-items:center; }
+      .thumb{
+        width:84px; height:84px; flex:0 0 84px;
+        border-radius:20px; background:var(--white);
+        display:flex; align-items:center; justify-content:center; overflow:hidden;
+      }
+      .thumb svg{ width:56px; height:56px; }
+      .card-title{ font-size:20px; margin:0 0 4px; line-height:1.3; }
+      .card-sub{ color:var(--muted); font-size:16.5px; margin:0; display:flex; align-items:center; gap:7px; }
+      .card-sub svg{ width:19px; height:19px; flex:0 0 19px; }
+      .status-chip{
+        display:inline-flex; align-items:center; gap:8px;
+        border-radius:999px; color:#fff;
+        font-size:16.5px; padding:8px 16px; margin-top:14px;
+      }
+      .status-chip .cdot{ width:10px; height:10px; border-radius:50%; background:#fff; }
+      .chip-amber{ background:var(--amber); }
+      .chip-blue{ background:var(--blue); }
+      .chip-green{ background:var(--green); }
+      .chip-teal{ background:var(--teal); }
+      .chip-red{ background:var(--red); }
+
+      /* Job card */
+      .jobcard{
+        background:var(--white); border:2px dashed var(--hairline);
+        border-radius:var(--radius); padding:22px 20px;
+      }
+      .jobcard-head{ text-align:center; border-bottom:1px solid var(--hairline); padding-bottom:14px; margin-bottom:16px; }
+      .jobcard-head .jc-trust{ font-size:19px; }
+      .jobcard-head .jc-label{ color:var(--meta); font-size:14px; letter-spacing:.08em; text-transform:uppercase; margin-top:3px; }
+      .jobcard .photo-tile{ margin-top:0; }
+      .jc-row{ margin-top:16px; }
+      .jc-row .jc-k{ color:var(--meta); font-size:15px; margin:0 0 3px; }
+      .jc-row .jc-v{ font-size:20px; margin:0; }
+      .jc-cost{
+        background:var(--fog); border-radius:18px; padding:16px 20px;
+        display:flex; justify-content:space-between; align-items:center; margin-top:18px;
+        font-size:19px;
+      }
+      .jc-cost b{ font-size:22px; font-weight:600; }
+      .state-banner{
+        border-radius:20px; padding:16px 20px; text-align:center;
+        font-size:19px; margin-top:18px;
+        display:flex; align-items:center; justify-content:center; gap:10px;
+      }
+      .state-banner svg{ width:24px; height:24px; }
+      .state-banner.blue{ background:#E8F2FD; color:var(--blue); }
+      .state-banner.green{ background:#E5F5EC; color:var(--green); }
+
+      /* Rooms */
+      .room-card{ display:flex; align-items:center; gap:16px; }
+      .room-icon{
+        width:64px; height:64px; flex:0 0 64px; border-radius:50%;
+        background:var(--white); display:flex; align-items:center; justify-content:center;
+        color:var(--teal);
+      }
+      .room-icon svg{ width:32px; height:32px; }
+      .room-info{ flex:1; }
+      .room-info .card-title{ margin:0; }
+      .room-card .status-chip{ margin-top:0; }
+
+      /* Fees */
+      .resident-card{ text-align:center; padding:26px 20px; }
+      .avatar{
+        width:76px; height:76px; border-radius:50%;
+        background:var(--teal); color:#fff;
+        display:flex; align-items:center; justify-content:center;
+        font-size:30px; margin:0 auto 12px;
+      }
+      .amount-big{ font-size:40px; letter-spacing:-0.02em; margin:14px 0 2px; }
+      .due-line{ color:var(--red); font-size:18px; margin:0; }
+      .receipt-card{ text-align:center; padding:26px 20px; }
+      .receipt-card .status-chip{ margin-top:0; }
+
+      /* Reports */
+      .report-card{ padding:24px 22px; }
+      .report-top{ display:flex; align-items:center; gap:16px; }
+      .report-icon{
+        width:60px; height:60px; flex:0 0 60px; border-radius:50%;
+        background:var(--white); display:flex; align-items:center; justify-content:center;
+      }
+      .report-icon svg{ width:30px; height:30px; }
+      .report-num{ font-size:36px; letter-spacing:-0.02em; line-height:1.1; }
+      .report-label{ color:var(--muted); font-size:17px; }
+      .bar-track{ height:12px; border-radius:6px; background:var(--white); margin-top:18px; overflow:hidden; }
+      .bar-fill{ height:100%; border-radius:6px; }
+
+      .section-gap{ height:8px; }
+    </style>
+  </head>
+  <body>
+    <div class="phone" id="phone"></div>
+
+    <script>
+      /* ---------- Icons (inline SVG, stroke style) ---------- */
+      function svg(paths, filled){
+        return '<svg viewBox="0 0 24 24" fill="' + (filled ? 'currentColor' : 'none') +
+          '" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + paths + '</svg>';
+      }
+      var I = {
+        back: svg('<path d="m15 18-6-6 6-6"/>'),
+        home: svg('<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/>'),
+        phone: svg('<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M12 18h.01"/>'),
+        lock: svg('<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'),
+        plus: svg('<circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/>'),
+        ticket: svg('<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2M13 11v2M13 17v2"/>'),
+        tool: svg('<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>'),
+        bed: svg('<path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/>'),
+        building: svg('<rect x="4" y="2" width="16" height="20" rx="1"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M12 6h.01M8 10h.01M16 10h.01M12 10h.01M8 14h.01M16 14h.01M12 14h.01"/>'),
+        rupee: svg('<path d="M6 3h12"/><path d="M6 8h12"/><path d="m6 13 8.5 8"/><path d="M6 13h3"/><path d="M9.5 3a3.5 3.5 0 0 1 0 5"/>'),
+        chart: svg('<path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>'),
+        drop: svg('<path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/>'),
+        bulb: svg('<path d="M15 14c.2-1 .7-1.7 1.5-2.5C17.5 10.6 18 9.3 18 8A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>'),
+        broom: svg('<path d="M16 3l5 5"/><path d="M13.5 7.5 9 12"/><path d="M9 12l-3.5 8"/><path d="M9 12l.5 8.5"/><path d="M9 12l3.5 7.5"/><path d="M5.5 15.5 12 19"/>'),
+        hammer: svg('<path d="m15 12-8.5 8.5a2.12 2.12 0 1 1-3-3L12 9"/><path d="M17.64 15 22 10.64"/><path d="m20.91 11.7-1.91-1.91a2 2 0 0 1-.88-1.28L17.56 6.4a2 2 0 0 0-2.83 0L11.2 9.93"/>'),
+        fan: svg('<circle cx="12" cy="12" r="1.6"/><path d="M12 10.4c-1-2.5-.4-5.4 1.4-6.9 1.6 1.2 1.4 4.5-1.4 6.9z"/><path d="M13.4 12.8c2.7.2 5 1.9 5.6 4.2-1.8.9-4.6-.6-5.6-4.2z"/><path d="M10.6 12.8c-2.7.2-5 1.9-5.6 4.2 1.8.9 4.6-.6 5.6-4.2z"/>'),
+        lift: svg('<rect x="5" y="2" width="14" height="20" rx="2"/><path d="m9.5 9.5 2.5-2.5 2.5 2.5"/><path d="m9.5 14.5 2.5 2.5 2.5-2.5"/>'),
+        brush: svg('<path d="m14.6 3.4 6 6L12 18a2.1 2.1 0 0 1-3 0l-2.4-2.4a2.1 2.1 0 0 1 0-3z"/><path d="M6.5 15.5c-1.2 1.6-2 3.4-2.2 5.3 1.9-.2 3.7-1 5.3-2.2"/>'),
+        dots: svg('<circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/>', true),
+        camera: svg('<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3.2"/>'),
+        mic: svg('<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/>'),
+        check: svg('<path d="M20 6 9 17l-5-5"/>'),
+        pin: svg('<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>'),
+        clock: svg('<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>'),
+        user: svg('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/>'),
+        play: svg('<polygon points="6 4 20 12 6 20" fill="currentColor" stroke="none"/>')
+      };
+
+      /* ---------- Illustrations ---------- */
+      var ILLUS_HERO =
+        '<svg viewBox="0 0 360 210" fill="none" stroke="#1D1D1F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Temple, hostel and guest house connected to one system">' +
+        /* temple */
+        '<path d="M52 118 L60 84 L68 118" fill="#D9A395"/>' +
+        '<path d="M46 118 h36 M42 132 h44 M38 146 h52" />' +
+        '<rect x="34" y="146" width="60" height="34" fill="#F5E9DF"/>' +
+        '<path d="M64 84 V66" /><path d="M64 66 l14 4 -14 4" fill="#D64545" stroke="#D64545"/>' +
+        '<path d="M58 180 v-16 a6 6 0 0 1 12 0 v16" fill="#FFFFFF"/>' +
+        /* hostel */
+        '<rect x="140" y="56" width="84" height="124" fill="#E8F2FD"/>' +
+        '<path d="M134 56 h96" stroke="#0071E3"/>' +
+        '<rect x="152" y="70" width="14" height="14" fill="#FFFFFF"/><rect x="176" y="70" width="14" height="14" fill="#FFFFFF"/><rect x="200" y="70" width="14" height="14" fill="#FFFFFF"/>' +
+        '<rect x="152" y="96" width="14" height="14" fill="#FFFFFF"/><rect x="176" y="96" width="14" height="14" fill="#FFFFFF"/><rect x="200" y="96" width="14" height="14" fill="#FFFFFF"/>' +
+        '<rect x="152" y="122" width="14" height="14" fill="#FFFFFF"/><rect x="176" y="122" width="14" height="14" fill="#FFFFFF"/><rect x="200" y="122" width="14" height="14" fill="#FFFFFF"/>' +
+        '<rect x="174" y="150" width="16" height="30" fill="#FFFFFF"/>' +
+        /* guest house */
+        '<path d="M262 108 L298 80 L334 108" fill="#DCE9DC"/>' +
+        '<rect x="268" y="108" width="60" height="72" fill="#EFF5EC"/>' +
+        '<rect x="288" y="140" width="18" height="40" fill="#FFFFFF"/>' +
+        '<rect x="276" y="116" width="14" height="14" fill="#FFFFFF"/>' +
+        /* ground + connectors to hub */
+        '<path d="M16 180 H344" stroke="#D2D2D7"/>' +
+        '<path d="M64 180 C64 196 120 192 158 196" stroke="#0071E3"/>' +
+        '<path d="M182 180 V192" stroke="#0071E3"/>' +
+        '<path d="M298 180 C298 196 240 192 202 196" stroke="#0071E3"/>' +
+        '<circle cx="180" cy="197" r="10" fill="#0071E3" stroke="#0071E3"/>' +
+        '<path d="M175.5 197 l3.2 3.2 5.8-6.2" stroke="#FFFFFF" stroke-width="2.4"/>' +
+        '</svg>';
+
+      var ILLUS_TAP =
+        '<svg viewBox="0 0 200 150" fill="none" stroke="#1D1D1F" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Leaking water tap">' +
+        '<path d="M20 20 h160" stroke="#D2D2D7"/>' +
+        '<path d="M52 20 v34" />' +
+        '<path d="M52 54 h64 a14 14 0 0 1 14 14 v8" />' +
+        '<path d="M122 76 h16 v10 h-16 z" fill="#E8F2FD"/>' +
+        '<path d="M40 40 h24 M52 32 v16" stroke="#0071E3"/>' +
+        '<circle cx="52" cy="40" r="5" fill="#0071E3" stroke="#0071E3"/>' +
+        '<path d="M130 100 c4 6 6 9 6 12.5 a6 6 0 0 1 -12 0 c0 -3.5 2 -6.5 6 -12.5z" fill="#0071E3" stroke="#0071E3"/>' +
+        '<path d="M76 136 c14 -7 34 -7 54 0 c20 7 40 7 54 0" stroke="#0071E3"/>' +
+        '<path d="M84 144 c12 -5 28 -5 44 0" stroke="#0071E3"/>' +
+        '</svg>';
+
+      /* ---------- Languages ---------- */
+      var T = {
+        en: {
+          trustName: 'Shri Ambika Niketan Trust',
+          trustSub: 'One simple app for the whole Trust',
+          mobile: 'Mobile number',
+          password: 'Password',
+          login: 'Login',
+          loginNote: 'This is a demo. Any number and password will work.',
+          loginFooter: 'Demo for presentation. Sample data.',
+          homeTitle: 'Home',
+          greeting: 'Namaste, Rameshbhai',
+          greetingSub: 'What would you like to do today?',
+          appNew: 'New Complaint',
+          appMy: 'My Complaints',
+          appWork: 'Work Orders',
+          appGuest: 'Guest House',
+          appHostel: 'Hostel',
+          appFees: 'Fees and Money',
+          appReports: 'Reports',
+          newTitle: 'New Complaint',
+          qProblem: 'What is the problem?',
+          catWater: 'Water', catElec: 'Electricity', catClean: 'Cleaning', catCarpenter: 'Carpenter',
+          catAC: 'AC / Cooling', catLift: 'Lift', catPaint: 'Painting', catOther: 'Other',
+          qWhere: 'Where is it?',
+          placeTemple: 'Temple', placeHostelA: 'Hostel Block A', placeGuest: 'Guest House',
+          placeKitchen: 'Kitchen', placeOffice: 'Office',
+          takePhoto: 'Take a Photo',
+          photoAdded: 'Photo added',
+          orWord: 'or',
+          speak: 'Speak Your Problem',
+          spokenLine: 'The water pipe is leaking in the bathroom.',
+          qUrgent: 'How urgent is it?',
+          urgNormal: 'Normal', urgUrgent: 'Urgent', urgVery: 'Very Urgent',
+          next: 'Next',
+          submit: 'Send Complaint',
+          successTitle: 'Your complaint is registered',
+          ticketNo: 'Ticket number',
+          trkReceived: 'Received', trkStarted: 'Work Started', trkDone: 'Done',
+          goHome: 'Go to Home',
+          myTitle: 'My Complaints',
+          stWaiting: 'Waiting', stGoing: 'Work Going On', stDone: 'Done',
+          c1Title: 'Tap is leaking', c2Title: 'Light is not working', c3Title: 'Room cleaning needed',
+          seeJobCard: 'See Job Card',
+          jobTitle: 'Job Card',
+          jcWork: 'Work to do',
+          jcWorkText: 'Fix the leaking water tap',
+          jcWho: 'Who will do the work',
+          jcAgency: 'Shree Plumbing Works',
+          jcCost: 'Estimated cost',
+          startWork: 'Start Work',
+          workDoneBtn: 'Work Done',
+          workStartedMsg: 'Work has started',
+          workDoneMsg: 'Work is done. Thank you.',
+          guestTitle: 'Guest House',
+          room: 'Room',
+          roomEmpty: 'Empty', roomBooked: 'Booked',
+          newBooking: 'New Booking',
+          guestName: 'Guest name',
+          confirmBooking: 'Confirm Booking',
+          bookedTitle: 'Room is booked',
+          bookedSub: 'The guest can come and stay.',
+          hostelTitle: 'Hostel Fees',
+          residentName: 'Kiran Patel',
+          roomBed: 'Room 12, Bed 4',
+          feesDue: 'Fees due',
+          payBy: 'Pay by 10 October',
+          payFees: 'Pay Fees',
+          paidWord: 'Paid',
+          receipt: 'Receipt',
+          receiptNo: 'Receipt number',
+          repTitle: 'Reports',
+          rep1: 'Complaints this month', rep2: 'Work done', rep3: 'Fees collected',
+          backWord: 'Back'
+        },
+        gu: {
+          trustName: 'શ્રી અંબિકા નિકેતન ટ્રસ્ટ',
+          trustSub: 'આખા ટ્રસ્ટ માટે એક સરળ એપ',
+          mobile: 'મોબાઈલ નંબર',
+          password: 'પાસવર્ડ',
+          login: 'લોગિન કરો',
+          loginNote: 'ડેમો છે. કોઈ પણ નંબર અને પાસવર્ડ ચાલશે.',
+          loginFooter: 'પ્રેઝન્ટેશન માટેનો ડેમો. આ નમૂનાનો ડેટા છે.',
+          homeTitle: 'હોમ',
+          greeting: 'નમસ્તે, રમેશભાઈ',
+          greetingSub: 'આજે તમારે શું કરવું છે?',
+          appNew: 'નવી ફરિયાદ',
+          appMy: 'મારી ફરિયાદો',
+          appWork: 'વર્ક ઓર્ડર',
+          appGuest: 'ગેસ્ટ હાઉસ',
+          appHostel: 'હોસ્ટેલ',
+          appFees: 'ફી અને પૈસા',
+          appReports: 'રિપોર્ટ',
+          newTitle: 'નવી ફરિયાદ',
+          qProblem: 'શું તકલીફ છે?',
+          catWater: 'પાણી', catElec: 'વીજળી', catClean: 'સફાઈ', catCarpenter: 'સુથાર',
+          catAC: 'એસી / ઠંડક', catLift: 'લિફ્ટ', catPaint: 'રંગકામ', catOther: 'બીજું',
+          qWhere: 'ક્યાં છે?',
+          placeTemple: 'મંદિર', placeHostelA: 'હોસ્ટેલ બ્લોક A', placeGuest: 'ગેસ્ટ હાઉસ',
+          placeKitchen: 'રસોડું', placeOffice: 'ઓફિસ',
+          takePhoto: 'ફોટો પાડો',
+          photoAdded: 'ફોટો ઉમેરાઈ ગયો',
+          orWord: 'અથવા',
+          speak: 'તમારી તકલીફ બોલો',
+          spokenLine: 'બાથરૂમમાં પાણીની પાઈપ લીક થાય છે.',
+          qUrgent: 'કેટલું જરૂરી છે?',
+          urgNormal: 'સામાન્ય', urgUrgent: 'જરૂરી', urgVery: 'ખૂબ જરૂરી',
+          next: 'આગળ',
+          submit: 'ફરિયાદ મોકલો',
+          successTitle: 'તમારી ફરિયાદ નોંધાઈ ગઈ છે',
+          ticketNo: 'ટિકિટ નંબર',
+          trkReceived: 'મળી ગઈ', trkStarted: 'કામ શરૂ', trkDone: 'પૂરું થયું',
+          goHome: 'હોમ પર જાઓ',
+          myTitle: 'મારી ફરિયાદો',
+          stWaiting: 'બાકી છે', stGoing: 'કામ ચાલુ છે', stDone: 'પૂરું થયું',
+          c1Title: 'નળ લીક થાય છે', c2Title: 'લાઈટ ચાલતી નથી', c3Title: 'રૂમની સફાઈ કરવી છે',
+          seeJobCard: 'જોબ કાર્ડ જુઓ',
+          jobTitle: 'જોબ કાર્ડ',
+          jcWork: 'કરવાનું કામ',
+          jcWorkText: 'લીક થતો પાણીનો નળ સરખો કરવાનો છે',
+          jcWho: 'કામ કોણ કરશે',
+          jcAgency: 'Shree Plumbing Works',
+          jcCost: 'અંદાજે ખર્ચ',
+          startWork: 'કામ શરૂ કરો',
+          workDoneBtn: 'કામ પૂરું કરો',
+          workStartedMsg: 'કામ શરૂ થઈ ગયું છે',
+          workDoneMsg: 'કામ પૂરું થઈ ગયું છે. આભાર.',
+          guestTitle: 'ગેસ્ટ હાઉસ',
+          room: 'રૂમ',
+          roomEmpty: 'ખાલી છે', roomBooked: 'બુક છે',
+          newBooking: 'નવી બુકિંગ',
+          guestName: 'મહેમાનનું નામ',
+          confirmBooking: 'બુકિંગ નક્કી કરો',
+          bookedTitle: 'રૂમ બુક થઈ ગયો છે',
+          bookedSub: 'મહેમાન આવીને રહી શકે છે.',
+          hostelTitle: 'હોસ્ટેલ ફી',
+          residentName: 'કિરણ પટેલ',
+          roomBed: 'રૂમ 12, બેડ 4',
+          feesDue: 'બાકી ફી',
+          payBy: '10 ઓક્ટોબર સુધીમાં ભરો',
+          payFees: 'ફી ભરો',
+          paidWord: 'ભરાઈ ગઈ',
+          receipt: 'રસીદ',
+          receiptNo: 'રસીદ નંબર',
+          repTitle: 'રિપોર્ટ',
+          rep1: 'આ મહિનાની ફરિયાદો', rep2: 'પૂરું થયેલું કામ', rep3: 'મળેલી ફી',
+          backWord: 'પાછા'
+        },
+        hi: {
+          trustName: 'श्री अंबिका निकेतन ट्रस्ट',
+          trustSub: 'पूरे ट्रस्ट के लिए एक आसान ऐप',
+          mobile: 'मोबाइल नंबर',
+          password: 'पासवर्ड',
+          login: 'लॉगिन करें',
+          loginNote: 'डेमो है। कोई भी नंबर और पासवर्ड चलेगा।',
+          loginFooter: 'प्रेज़ेंटेशन के लिए डेमो है। यह सैंपल डेटा है।',
+          homeTitle: 'होम',
+          greeting: 'नमस्ते, रमेशभाई',
+          greetingSub: 'आज आपको क्या करना है?',
+          appNew: 'नई शिकायत',
+          appMy: 'मेरी शिकायतें',
+          appWork: 'वर्क ऑर्डर',
+          appGuest: 'गेस्ट हाउस',
+          appHostel: 'हॉस्टल',
+          appFees: 'फीस और पैसा',
+          appReports: 'रिपोर्ट',
+          newTitle: 'नई शिकायत',
+          qProblem: 'क्या परेशानी है?',
+          catWater: 'पानी', catElec: 'बिजली', catClean: 'सफ़ाई', catCarpenter: 'बढ़ई',
+          catAC: 'एसी / ठंडक', catLift: 'लिफ्ट', catPaint: 'पेंटिंग', catOther: 'अन्य',
+          qWhere: 'कहाँ है?',
+          placeTemple: 'मंदिर', placeHostelA: 'हॉस्टल ब्लॉक A', placeGuest: 'गेस्ट हाउस',
+          placeKitchen: 'रसोई', placeOffice: 'दफ़्तर',
+          takePhoto: 'फोटो लें',
+          photoAdded: 'फोटो लग गया',
+          orWord: 'या',
+          speak: 'अपनी परेशानी बोलें',
+          spokenLine: 'बाथरूम में पानी की पाइप से पानी टपक रहा है।',
+          qUrgent: 'कितना ज़रूरी है?',
+          urgNormal: 'सामान्य', urgUrgent: 'ज़रूरी', urgVery: 'बहुत ज़रूरी',
+          next: 'आगे',
+          submit: 'शिकायत भेजें',
+          successTitle: 'आपकी शिकायत दर्ज हो गई है',
+          ticketNo: 'टिकट नंबर',
+          trkReceived: 'मिल गई', trkStarted: 'काम शुरू', trkDone: 'हो गया',
+          goHome: 'होम पर जाएं',
+          myTitle: 'मेरी शिकायतें',
+          stWaiting: 'बाकी है', stGoing: 'काम चल रहा है', stDone: 'हो गया',
+          c1Title: 'नल से पानी टपक रहा है', c2Title: 'लाइट नहीं चल रही', c3Title: 'कमरे की सफ़ाई करनी है',
+          seeJobCard: 'जॉब कार्ड देखें',
+          jobTitle: 'जॉब कार्ड',
+          jcWork: 'करने वाला काम',
+          jcWorkText: 'टपकता हुआ पानी का नल ठीक करना है',
+          jcWho: 'काम कौन करेगा',
+          jcAgency: 'Shree Plumbing Works',
+          jcCost: 'अनुमानित खर्च',
+          startWork: 'काम शुरू करें',
+          workDoneBtn: 'काम पूरा करें',
+          workStartedMsg: 'काम शुरू हो गया है',
+          workDoneMsg: 'काम पूरा हो गया है। धन्यवाद।',
+          guestTitle: 'गेस्ट हाउस',
+          room: 'कमरा',
+          roomEmpty: 'खाली है', roomBooked: 'बुक है',
+          newBooking: 'नई बुकिंग',
+          guestName: 'मेहमान का नाम',
+          confirmBooking: 'बुकिंग पक्की करें',
+          bookedTitle: 'कमरा बुक हो गया है',
+          bookedSub: 'मेहमान आकर रह सकते हैं।',
+          hostelTitle: 'हॉस्टल फीस',
+          residentName: 'किरण पटेल',
+          roomBed: 'कमरा 12, बेड 4',
+          feesDue: 'बाकी फीस',
+          payBy: '10 अक्टूबर तक भरें',
+          payFees: 'फीस भरें',
+          paidWord: 'भर दी गई',
+          receipt: 'रसीद',
+          receiptNo: 'रसीद नंबर',
+          repTitle: 'रिपोर्ट',
+          rep1: 'इस महीने की शिकायतें', rep2: 'पूरा हुआ काम', rep3: 'मिली हुई फीस',
+          backWord: 'वापस'
+        }
+      };
+
+      /* ---------- State ---------- */
+      var lang = 'gu';
+      var stack = ['login'];
+      var cmp = { cat: null, place: null, photo: false, spoken: false, urg: null, step: 1 };
+      var jobState = 'todo'; /* todo | started | done */
+      var rooms = [ { no: '101', booked: false }, { no: '102', booked: true } ];
+      var feePaid = false;
+      var detailId = 1;
+
+      var COMPLAINTS = [
+        { id: 1, titleKey: 'c1Title', cat: 'water', placeKey: 'placeHostelA', status: 'waiting', icon: I.drop, color: '#0071E3', tint: '#E8F2FD' },
+        { id: 2, titleKey: 'c2Title', cat: 'elec', placeKey: 'placeTemple', status: 'going', icon: I.bulb, color: '#E8A13A', tint: '#FBF1DE' },
+        { id: 3, titleKey: 'c3Title', cat: 'clean', placeKey: 'placeGuest', status: 'done', icon: I.broom, color: '#0E7C86', tint: '#E2F1F2' }
+      ];
+      var CATS = [
+        { key: 'water', label: 'catWater', icon: I.drop, color: '#0071E3', tint: '#E8F2FD' },
+        { key: 'elec', label: 'catElec', icon: I.bulb, color: '#E8A13A', tint: '#FBF1DE' },
+        { key: 'clean', label: 'catClean', icon: I.broom, color: '#0E7C86', tint: '#E2F1F2' },
+        { key: 'carp', label: 'catCarpenter', icon: I.hammer, color: '#B07261', tint: '#F7EAE5' },
+        { key: 'ac', label: 'catAC', icon: I.fan, color: '#5B8DEF', tint: '#EAF0FE' },
+        { key: 'lift', label: 'catLift', icon: I.lift, color: '#7A6FD0', tint: '#EFEDFA' },
+        { key: 'paint', label: 'catPaint', icon: I.brush, color: '#C25E7E', tint: '#F9EAF0' },
+        { key: 'other', label: 'catOther', icon: I.dots, color: '#6E6E73', tint: '#F0F0F2' }
+      ];
+      var PLACES = ['placeTemple', 'placeHostelA', 'placeGuest', 'placeKitchen', 'placeOffice'];
+
+      function t(k){ return T[lang][k] || k; }
+      function cur(){ return stack[stack.length - 1]; }
+
+      /* ---------- Navigation ---------- */
+      function go(screen){ stack.push(screen); render(); window.scrollTo(0, 0); }
+      function back(){ if (stack.length > 1) stack.pop(); render(); window.scrollTo(0, 0); }
+      function goHome(){ stack = ['home']; render(); window.scrollTo(0, 0); }
+      function setLang(l){ lang = l; document.documentElement.lang = (l === 'gu' ? 'gu' : (l === 'hi' ? 'hi' : 'en')); render(); }
+
+      function langbar(big){
+        function b(code, label){ return '<button type="button" class="' + (lang === code ? 'active' : '') + '" onclick="setLang(\'' + code + '\')">' + label + '</button>'; }
+        return '<div class="langbar' + (big ? ' big' : '') + '">' + b('en', 'English') + b('gu', 'ગુજરાતી') + b('hi', 'हिन्दी') + '</div>';
+      }
+
+      function header(title){
+        return '<div class="appbar">' +
+          '<div class="appbar-row">' +
+            '<button type="button" class="icon-btn" aria-label="' + t('backWord') + '" onclick="back()">' + I.back + '</button>' +
+            '<div class="appbar-title">' + title + '</div>' +
+            '<button type="button" class="icon-btn" aria-label="' + t('homeTitle') + '" onclick="goHome()">' + I.home + '</button>' +
+          '</div>' + langbar(false) + '</div>';
+      }
+
+      function tracker(state){
+        /* state: 0 received only, 1 started, 2 done */
+        function dot(i){
+          if (state === 2 || i < state) return '<div class="tracker-dot done">' + I.check + '</div>';
+          if (i === state) return '<div class="tracker-dot now">' + (i + 1) + '</div>';
+          return '<div class="tracker-dot">' + (i + 1) + '</div>';
+        }
+        function bar(i){ return '<div class="tracker-bar' + (state === 2 || i < state ? ' done' : '') + '"></div>'; }
+        return '<div class="tracker"><div class="tracker-track">' +
+          '<div class="tracker-step">' + dot(0) + '</div>' + bar(0) +
+          '<div class="tracker-step">' + dot(1) + '</div>' + bar(1) +
+          '<div class="tracker-step">' + dot(2) + '</div>' +
+          '</div><div class="tracker-labels"><span>' + t('trkReceived') + '</span><span>' + t('trkStarted') + '</span><span>' + t('trkDone') + '</span></div></div>';
+      }
+
+      function statusChip(status){
+        if (status === 'waiting') return '<span class="status-chip chip-amber"><span class="cdot"></span>' + t('stWaiting') + '</span>';
+        if (status === 'going') return '<span class="status-chip chip-blue"><span class="cdot"></span>' + t('stGoing') + '</span>';
+        return '<span class="status-chip chip-green"><span class="cdot"></span>' + t('stDone') + '</span>';
+      }
+
+      /* ---------- Screens ---------- */
+      function scrLogin(){
+        return '<div class="view">' +
+          langbar(true) +
+          '<div class="login-hero">' + ILLUS_HERO + '</div>' +
+          '<h1 class="trust-name">' + t('trustName') + '</h1>' +
+          '<p class="trust-sub">' + t('trustSub') + '</p>' +
+          '<div class="field"><label for="f-mobile">' + t('mobile') + '</label>' +
+            '<div class="field-wrap">' + I.phone + '<input id="f-mobile" type="tel" inputmode="numeric" placeholder="98765 43210" /></div></div>' +
+          '<div class="field"><label for="f-pass">' + t('password') + '</label>' +
+            '<div class="field-wrap">' + I.lock + '<input id="f-pass" type="password" placeholder="••••••" /></div></div>' +
+          '<button type="button" class="btn btn-blue" onclick="doLogin()">' + t('login') + '</button>' +
+          '<p class="demo-note">' + t('loginNote') + '</p>' +
+          '<p class="login-footer">' + t('loginFooter') + '</p>' +
+        '</div>';
+      }
+      function doLogin(){ stack = ['home']; render(); window.scrollTo(0, 0); }
+
+      function tile(screen, icon, label, color, tint){
+        return '<button type="button" class="tile" onclick="go(\'' + screen + '\')">' +
+          '<span class="chip" style="background:' + tint + ';color:' + color + '">' + icon + '</span>' +
+          '<span class="tile-label">' + label + '</span></button>';
+      }
+      function scrHome(){
+        return header(t('homeTitle')) + '<div class="view">' +
+          '<h2 class="greeting">' + t('greeting') + '</h2>' +
+          '<p class="greeting-sub">' + t('greetingSub') + '</p>' +
+          '<div class="tile-grid">' +
+            tile('complaint', I.plus, t('appNew'), '#0071E3', '#E8F2FD') +
+            tile('my', I.ticket, t('appMy'), '#B07261', '#F7EAE5') +
+            tile('jobcard', I.tool, t('appWork'), '#E8A13A', '#FBF1DE') +
+            tile('guest', I.bed, t('appGuest'), '#0E7C86', '#E2F1F2') +
+            tile('hostel', I.building, t('appHostel'), '#5B8DEF', '#EAF0FE') +
+            tile('hostel', I.rupee, t('appFees'), '#1F9D55', '#E5F5EC') +
+            tile('reports', I.chart, t('appReports'), '#7A6FD0', '#EFEDFA') +
+          '</div></div>';
+      }
+
+      function stepDots(){
+        function d(i){
+          var cls = cmp.step === i ? 'now' : (cmp.step > i ? 'done' : '');
+          var inner = cmp.step > i ? I.check : i;
+          return '<div class="step-dot ' + cls + '">' + inner + '</div>';
+        }
+        return '<div class="step-dots">' + d(1) + '<div class="step-line"></div>' + d(2) + '<div class="step-line"></div>' + d(3) + '</div>';
+      }
+
+      function scrComplaint(){
+        var body = '';
+        if (cmp.step === 1) {
+          var cats = CATS.map(function(c){
+            return '<button type="button" class="cat' + (cmp.cat === c.key ? ' selected' : '') + '" style="color:' + c.color + '" onclick="pickCat(\'' + c.key + '\')">' + c.icon + '<span style="color:var(--ink)">' + t(c.label) + '</span></button>';
+          }).join('');
+          body = '<h2 class="step-q">' + t('qProblem') + '</h2><div class="cat-grid">' + cats + '</div>' +
+            '<button type="button" class="btn btn-blue' + (cmp.cat ? '' : ' disabled') + '" onclick="cmpStep(2)">' + t('next') + '</button>';
+        } else if (cmp.step === 2) {
+          var places = PLACES.map(function(p){
+            return '<button type="button" class="place' + (cmp.place === p ? ' selected' : '') + '" onclick="pickPlace(\'' + p + '\')">' + I.pin + '<span>' + t(p) + '</span></button>';
+          }).join('');
+          body = '<h2 class="step-q">' + t('qWhere') + '</h2><div class="place-list">' + places + '</div>';
+          if (cmp.photo) {
+            body += '<div class="photo-tile">' + ILLUS_TAP + '<div class="photo-ok">' + I.check + t('photoAdded') + '</div></div>';
+          } else {
+            body += '<button type="button" class="btn btn-fog" onclick="takePhoto()">' + I.camera + t('takePhoto') + '</button>';
+          }
+          if (cmp.spoken) {
+            body += '<div class="spoken-box">' + t('spokenLine') + '</div>';
+          } else {
+            body += '<p class="or-line">' + t('orWord') + '</p>' +
+              '<button type="button" class="btn btn-outline" onclick="speakNow()">' + I.mic + t('speak') + '</button>';
+          }
+          body += '<button type="button" class="btn btn-blue' + (cmp.place ? '' : ' disabled') + '" onclick="cmpStep(3)">' + t('next') + '</button>';
+        } else {
+          function urg(val, labelKey, color){
+            return '<button type="button" class="urgency' + (cmp.urg === val ? ' selected' : '') + '" onclick="pickUrg(\'' + val + '\')">' +
+              '<span class="dot" style="background:' + color + '"></span><span>' + t(labelKey) + '</span></button>';
+          }
+          body = '<h2 class="step-q">' + t('qUrgent') + '</h2><div class="urgency-list">' +
+            urg('normal', 'urgNormal', '#1F9D55') + urg('urgent', 'urgUrgent', '#E8A13A') + urg('very', 'urgVery', '#D64545') +
+            '</div>' +
+            '<button type="button" class="btn btn-green' + (cmp.urg ? '' : ' disabled') + '" onclick="submitComplaint()">' + I.check + t('submit') + '</button>';
+        }
+        return header(t('newTitle')) + '<div class="view">' + stepDots() + body + '</div>';
+      }
+      function pickCat(k){ cmp.cat = k; render(); }
+      function pickPlace(p){ cmp.place = p; render(); }
+      function pickUrg(u){ cmp.urg = u; render(); }
+      function takePhoto(){ cmp.photo = true; render(); }
+      function speakNow(){ cmp.spoken = true; render(); }
+      function cmpStep(n){ cmp.step = n; render(); window.scrollTo(0, 0); }
+      function submitComplaint(){ go('success'); }
+
+      function scrSuccess(){
+        return header(t('newTitle')) + '<div class="view"><div class="success-wrap">' +
+          '<div class="big-tick">' + I.check + '</div>' +
+          '<h2 class="success-title">' + t('successTitle') + '</h2>' +
+          '<p class="ticket-no">' + t('ticketNo') + ': <b>CMP-1042</b></p>' +
+          tracker(0) +
+          '<button type="button" class="btn btn-blue" onclick="finishFlow()">' + I.home + t('goHome') + '</button>' +
+        '</div></div>';
+      }
+      function finishFlow(){
+        cmp = { cat: null, place: null, photo: false, spoken: false, urg: null, step: 1 };
+        goHome();
+      }
+
+      function complaintCard(c){
+        return '<button type="button" class="card" onclick="openDetail(' + c.id + ')">' +
+          '<div class="card-top"><div class="thumb" style="color:' + c.color + ';background:' + c.tint + '">' + c.icon + '</div>' +
+          '<div><p class="card-title">' + t(c.titleKey) + '</p>' +
+          '<p class="card-sub">' + I.pin + t(c.placeKey) + '</p></div></div>' +
+          statusChip(c.status) + '</button>';
+      }
+      function scrMy(){
+        return header(t('myTitle')) + '<div class="view">' + COMPLAINTS.map(complaintCard).join('') + '</div>';
+      }
+      function openDetail(id){ detailId = id; go('detail'); }
+      function scrDetail(){
+        var c = COMPLAINTS.filter(function(x){ return x.id === detailId; })[0];
+        var state = c.status === 'waiting' ? 0 : (c.status === 'going' ? 1 : 2);
+        return header(t('myTitle')) + '<div class="view">' +
+          '<div class="card"><div class="card-top"><div class="thumb" style="color:' + c.color + ';background:' + c.tint + '">' + c.icon + '</div>' +
+          '<div><p class="card-title">' + t(c.titleKey) + '</p>' +
+          '<p class="card-sub">' + I.pin + t(c.placeKey) + '</p>' +
+          '<p class="card-sub">' + I.ticket + 'CMP-104' + c.id + '</p></div></div>' +
+          statusChip(c.status) + '</div>' +
+          tracker(state) +
+          '<button type="button" class="btn btn-blue" onclick="go(\'jobcard\')">' + I.tool + t('seeJobCard') + '</button>' +
+        '</div>';
+      }
+
+      function scrJobcard(){
+        var banner = '';
+        if (jobState === 'started') banner = '<div class="state-banner blue">' + I.clock + t('workStartedMsg') + '</div>';
+        if (jobState === 'done') banner = '<div class="state-banner green">' + I.check + t('workDoneMsg') + '</div>';
+        var buttons = '';
+        if (jobState === 'todo') {
+          buttons = '<button type="button" class="btn btn-blue" onclick="setJob(\'started\')">' + I.play + t('startWork') + '</button>';
+        } else if (jobState === 'started') {
+          buttons = '<button type="button" class="btn btn-green" onclick="setJob(\'done\')">' + I.check + t('workDoneBtn') + '</button>';
+        }
+        return header(t('jobTitle')) + '<div class="view">' +
+          '<div class="jobcard">' +
+            '<div class="jobcard-head"><div class="jc-trust">' + t('trustName') + '</div><div class="jc-label">' + t('jobTitle') + ' · JC-221</div></div>' +
+            '<div class="photo-tile">' + ILLUS_TAP + '</div>' +
+            '<div class="jc-row"><p class="jc-k">' + t('jcWork') + '</p><p class="jc-v">' + t('jcWorkText') + '</p></div>' +
+            '<div class="jc-row"><p class="jc-k">' + t('appMy') + ' · ' + t('ticketNo') + '</p><p class="jc-v">CMP-1041</p></div>' +
+            '<div class="jc-row"><p class="jc-k">' + t('qWhere') + '</p><p class="jc-v">' + t('placeHostelA') + '</p></div>' +
+            '<div class="jc-row"><p class="jc-k">' + t('jcWho') + '</p><p class="jc-v">' + t('jcAgency') + '</p></div>' +
+            '<div class="jc-cost"><span>' + t('jcCost') + '</span><b>Rs 850</b></div>' +
+            banner + buttons +
+          '</div></div>';
+      }
+      function setJob(s){ jobState = s; render(); }
+
+      function scrGuest(){
+        var cards = rooms.map(function(r){
+          var chip = r.booked
+            ? '<span class="status-chip chip-red">' + t('roomBooked') + '</span>'
+            : '<span class="status-chip chip-green">' + t('roomEmpty') + '</span>';
+          return '<div class="card"><div class="room-card">' +
+            '<div class="room-icon">' + I.bed + '</div>' +
+            '<div class="room-info"><p class="card-title">' + t('room') + ' ' + r.no + '</p></div>' + chip +
+          '</div></div>';
+        }).join('');
+        return header(t('guestTitle')) + '<div class="view">' + cards +
+          '<button type="button" class="btn btn-blue" onclick="go(\'booking\')">' + I.plus + t('newBooking') + '</button></div>';
+      }
+      function scrBooking(){
+        return header(t('newBooking')) + '<div class="view">' +
+          '<div class="field"><label for="g-name">' + t('guestName') + '</label>' +
+            '<div class="field-wrap">' + I.user + '<input id="g-name" type="text" placeholder="..." /></div></div>' +
+          '<div class="field"><label for="g-mobile">' + t('mobile') + '</label>' +
+            '<div class="field-wrap">' + I.phone + '<input id="g-mobile" type="tel" inputmode="numeric" placeholder="98765 43210" /></div></div>' +
+          '<button type="button" class="btn btn-green" onclick="confirmBooking()">' + I.check + t('confirmBooking') + '</button>' +
+        '</div>';
+      }
+      function confirmBooking(){ rooms[0].booked = true; go('booked'); }
+      function scrBooked(){
+        return header(t('guestTitle')) + '<div class="view"><div class="success-wrap">' +
+          '<div class="big-tick">' + I.check + '</div>' +
+          '<h2 class="success-title">' + t('bookedTitle') + '</h2>' +
+          '<p class="ticket-no">' + t('room') + ' 101</p>' +
+          '<p class="trust-sub">' + t('bookedSub') + '</p>' +
+          '<button type="button" class="btn btn-blue" onclick="goHome()">' + I.home + t('goHome') + '</button>' +
+        '</div></div>';
+      }
+
+      function scrHostel(){
+        var body;
+        if (!feePaid) {
+          body = '<div class="card resident-card">' +
+            '<div class="avatar">' + t('residentName').charAt(0) + '</div>' +
+            '<p class="card-title" style="font-size:23px">' + t('residentName') + '</p>' +
+            '<p class="card-sub" style="justify-content:center">' + I.pin + t('roomBed') + '</p>' +
+            '<p class="report-label" style="margin-top:22px">' + t('feesDue') + '</p>' +
+            '<p class="amount-big">Rs 3,500</p>' +
+            '<p class="due-line">' + t('payBy') + '</p></div>' +
+            '<button type="button" class="btn btn-green" onclick="payFees()">' + I.rupee + t('payFees') + '</button>';
+        } else {
+          body = '<div class="card receipt-card">' +
+            '<span class="status-chip chip-green"><span class="cdot"></span>' + t('paidWord') + '</span>' +
+            '<p class="card-title" style="font-size:23px;margin-top:16px">' + t('residentName') + '</p>' +
+            '<p class="card-sub" style="justify-content:center">' + I.pin + t('roomBed') + '</p>' +
+            '<p class="amount-big">Rs 3,500</p>' +
+            '<p class="report-label">' + t('receipt') + '</p>' +
+            '<p class="ticket-no" style="margin-top:4px">' + t('receiptNo') + ': <b>HSTFEE-2211</b></p></div>' +
+            '<button type="button" class="btn btn-fog" onclick="unpayFees()">' + t('backWord') + '</button>';
+        }
+        return header(t('hostelTitle')) + '<div class="view">' + body + '</div>';
+      }
+      function payFees(){ feePaid = true; render(); }
+      function unpayFees(){ feePaid = false; render(); }
+
+      function reportCard(icon, num, labelKey, color, tint, pct){
+        return '<div class="card report-card"><div class="report-top">' +
+          '<div class="report-icon" style="color:' + color + '">' + icon + '</div>' +
+          '<div><div class="report-num">' + num + '</div><div class="report-label">' + t(labelKey) + '</div></div></div>' +
+          '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%;background:' + color + '"></div></div></div>';
+      }
+      function scrReports(){
+        return header(t('repTitle')) + '<div class="view">' +
+          reportCard(I.ticket, '128', 'rep1', '#0071E3', '#E8F2FD', 72) +
+          reportCard(I.check, '112', 'rep2', '#1F9D55', '#E5F5EC', 88) +
+          reportCard(I.rupee, 'Rs 2,40,000', 'rep3', '#0E7C86', '#E2F1F2', 64) +
+        '</div>';
+      }
+
+      /* ---------- Render ---------- */
+      var SCREENS = {
+        login: scrLogin, home: scrHome, complaint: scrComplaint, success: scrSuccess,
+        my: scrMy, detail: scrDetail, jobcard: scrJobcard,
+        guest: scrGuest, booking: scrBooking, booked: scrBooked,
+        hostel: scrHostel, reports: scrReports
+      };
+      function render(){
+        document.getElementById('phone').innerHTML = SCREENS[cur()]();
+      }
+      render();
+    </script>
+  </body>
+</html>
